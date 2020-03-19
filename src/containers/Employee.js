@@ -82,6 +82,7 @@ class Employee extends Component {
     }
 
     handleChange = (event) => {
+        console.log(event)
         if(event.target.name === "phone"||event.target.name==="address"){
             let aId = event.target.getAttribute("data-id");
             let val = this.state[event.target.name];
@@ -95,7 +96,13 @@ class Employee extends Component {
             });
         }
         
-    }    
+    }  
+    deleteUser = (id) =>{
+        console.log(id)
+    }
+    updateUser = (id) =>{
+        console.log(id)
+    }  
 
     render() {
         return (
@@ -111,7 +118,7 @@ class Employee extends Component {
                                 address={this.state.address} phone={this.state.phone} onLinkClick={this.onLinkClick} phoneCount={this.state.phoneCount} addressCount={this.state.addressCount}/>
                             </Col>
                             <Col md={8}>
-                                <EmployeeTable users={this.state.users}/> 
+                                <EmployeeTable users={this.state.users} updateUser={(id)=>this.updateUser(id)}  deleteUser={(id)=>this.deleteUser(id)} handleChange={this.handleChange}/> 
                             </Col> 
                         </Row>
                     </div>
