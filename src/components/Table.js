@@ -2,24 +2,36 @@ import React, { useState } from 'react';
 import { Table, Button, ButtonGroup, Alert } from 'react-bootstrap';
 
 const EmployeeTable = (props) => {
-    let phoneChildren=[],addressChildren=[];
-    props.users.map((user)=>{
-        user.phone.forEach((item,index)=>{
-            phoneChildren.push(<div key={index}><p>{item}</p><input className="d-none" type="text" value={item} data-id={index} name='phone' onChange={props.handleChange}/></div>)
-        })
-        user.address.forEach((item,index)=>{
-            addressChildren.push(<div key={index}><p>{item}</p><input className="d-none" type="text" value={item} data-id={index}  name='address' onChange={props.handleChange}/></div>) 
-        })
-    })
+    let [empId, setEmpid] = useState(null);
     let updateUser = (e,id) => {
         let action = e.target.getAttribute("data-action");
         if(action === 'edit'){
             e.target.setAttribute("data-action","update");
             e.target.innerHTML="Save";
+            setEmpid(id);
         } else{
             e.target.setAttribute("data-action","edit");
-            props.updateUser(id);
             e.target.innerHTML="Edit";
+            setEmpid(null);
+            let parent = document.getElementById("emp"+id);
+            let inputElements = parent.querySelectorAll("input, textarea");
+            let user={
+                id:id+1,
+                name: '',
+                age: '',
+                department: '',
+                bloodg:'',
+                address: [],
+                phone: []
+            };
+            Array.prototype.map.call(inputElements,(element,key)=>{
+                if(element.name==="phone"||element.name==="address"){
+                    user[element.name].push(element.value)
+                } else{
+                    user[element.name]=element.value
+                }
+            })      
+            props.updateUser(id,user);
         }
     }
     let deleteUser = (e,id) => {
@@ -36,39 +48,50 @@ const EmployeeTable = (props) => {
                             <th>Age</th>
                             <th>Department</th>
                             <th>Blood Group</th>
-                            <th>Address</th>
                             <th>Number</th>
+                            <th>Address</th>
                             <th>Update</th>
                         </tr>
                     </thead>
                     <tbody>
                         {props.users.map((item,key)=>{
                             return(
-                                <tr key={key}>
+                                <tr key={key} id={"emp"+key} className={(empId===key)?"edit":"update"}>
                                     <td><p>{item.id}</p></td>
                                     <td>
                                         <p>{item.name}</p>
-                                        <input type="text" name='name' className="d-none" value={item.name} onChange={props.handleChange}/>
+                                        <input type="text" name='name' defaultValue={item.name}/>
                                     </td>
                                     <td>
                                         <p>{item.age}</p>
-                                        <input type="text" name='age' className="d-none" value={item.age} onChange={props.handleChange}/>
+                                        <input type="text" name='age' defaultValue={item.age}/>
                                     </td>
                                     <td>
                                         <p>{item.department}</p>
-                                        <input type="text" name='department' className="d-none" value={item.department} onChange={props.handleChange}/>    
+                                        <input type="text" name='department' defaultValue={item.department}/>    
                                     </td>
                                     <td>
                                         <p>{item.bloodg}</p>
-                                        <input type="text" name='bloodg' className="d-none" value={item.bloodg} onChange={props.handleChange}/>
+                                        <input type="text" name='bloodg' defaultValue={item.bloodg}/>
                                     </td>
-                                    <td>{addressChildren}</td>
-                                    <td>{phoneChildren}</td>
+                                    <td>{
+                                        item.phone.map((item,index)=>{
+                                            return(
+                                              <div key={index} data-id={index}><p>{item}</p><input type="text" defaultValue={item} data-id={index} name='phone'/></div>  
+                                            )
+                                        })
+                                    }</td>
+                                    <td>{
+                                        item.address.map((item,index)=>{
+                                            return(
+                                                <div key={index} data-id={index}><p>{item}</p><input type="text" defaultValue={item} data-id={index}  name='address'/></div> 
+                                            )
+                                        })    
+                                    }</td>
                                     <td>
                                         <ButtonGroup>
-                                            <Button variant="primary" data-action="edit" onClick={(e)=>updateUser(e,key)}>Edit</Button>
-                                            {/* <Button variant="success" onClick={(e)=>editDetails(e,key)}>Save</Button> */}
-                                            <Button variant="danger" onClick={(e)=>deleteUser(e,key)}>Delete</Button>
+                                            <Button variant="primary" data-action="edit" data-id={key} onClick={(e)=>updateUser(e,key)}>Edit</Button>
+                                            <Button variant="danger" data-id={key} onClick={(e)=>deleteUser(e,key)}>Delete</Button>
                                         </ButtonGroup>
                                     </td>
                                 </tr>

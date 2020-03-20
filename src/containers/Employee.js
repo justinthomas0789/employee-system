@@ -5,6 +5,7 @@ import EmployeeTable from '../components/Table';
 // import { Thumbnail } from 'react-bootstrap';
 class Employee extends Component {
     userData;
+    arrayValues=[];
     constructor(props) {
         super(props);
         this.state = {
@@ -70,8 +71,8 @@ class Employee extends Component {
             address:this.state.address,
             phone:this.state.phone,
         }
-        users.push(user);
         if(user.name !== ''){
+            users.push(user);
             this.setState({
                 users: users,
             },this.setDataToLocal);
@@ -82,13 +83,13 @@ class Employee extends Component {
     }
 
     handleChange = (event) => {
-        console.log(event)
+        console.log(event.target.value)
         if(event.target.name === "phone"||event.target.name==="address"){
             let aId = event.target.getAttribute("data-id");
-            let val = this.state[event.target.name];
-            val[aId] = event.target.value;
+            this.arrayValues = this.state[event.target.name];
+            this.arrayValues[aId] = event.target.value;
             this.setState({
-                [event.target.name]: val
+                [event.target.name]: this.arrayValues
             });
         } else{
             this.setState({
@@ -98,10 +99,21 @@ class Employee extends Component {
         
     }  
     deleteUser = (id) =>{
-        console.log(id)
+        let users = this.state.users.slice(0, id).concat(this.state.users.slice(id + 1, this.state.users.length));
+        this.setState({
+            users: users,
+        },this.setDataToLocal);
     }
-    updateUser = (id) =>{
-        console.log(id)
+    updateUser = (id,user) =>{
+        let users = this.state.users;
+        if(user.name !== ''){
+            users[id]=user;
+            this.setState({
+                users: users,
+            },this.setDataToLocal);
+        } else{
+            alert('Please fill name')
+        }
     }  
 
     render() {
@@ -118,7 +130,7 @@ class Employee extends Component {
                                 address={this.state.address} phone={this.state.phone} onLinkClick={this.onLinkClick} phoneCount={this.state.phoneCount} addressCount={this.state.addressCount}/>
                             </Col>
                             <Col md={8}>
-                                <EmployeeTable users={this.state.users} updateUser={(id)=>this.updateUser(id)}  deleteUser={(id)=>this.deleteUser(id)} handleChange={this.handleChange}/> 
+                                <EmployeeTable users={this.state.users} updateUser={(id,user)=>this.updateUser(id,user)}  deleteUser={(id)=>this.deleteUser(id)} handleChange={this.handleChange}/> 
                             </Col> 
                         </Row>
                     </div>
